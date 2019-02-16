@@ -1,0 +1,484 @@
+﻿<html>
+<head>
+<meta charset="UTF-8">
+<title>マインスイーパーのプログラム</title>
+</head>
+<body background="../Image/background/back3.png"bgproperties="fixed">
+
+<font size="2"><font color="white">
+Option Explicit<br>
+<br>
+'開けたマスの数<br>
+Dim opened As Integer<br>
+<br>
+'残りの旗の数<br>
+Dim restmarks As Range<br>
+<br>
+'ボタンにするプログラム<br>
+Sub Restart()<br>
+<br>
+Dim a As Integer<br>
+a = Cells(4, 19).Value<br>
+<br>
+'フィールドをリセット→隠す→爆弾設置→手掛かり設置<br>
+Call Reset<br>
+Call Hide<br>
+Call Bomb_Set<br>
+Call Number_Set<br>
+<br>
+'開けたマスの数と旗を立てた数の初期化<br>
+opened = 0<br>
+Set restmarks = Range("S10")<br>
+restmarks = a<br>
+<br>
+End Sub<br>
+<br>
+'爆弾セットのプログラム<br>
+Sub Bomb_Set()<br>
+<br>
+'タテ列<br>
+Dim c As Integer<br>
+<br>
+'ヨコ列<br>
+Dim d As Integer<br>
+<br>
+'爆弾設置のカウント<br>
+Dim e As Integer<br>
+<br>
+'爆弾の数<br>
+Dim f As Integer<br>
+f = Cells(4, 19).Value<br>
+<br>
+'乱数の初期化をする<br>
+Randomize<br>
+<br>
+'上限を256までとする<br>
+If f = 0 Then<br>
+MsgBox ("爆弾0個ではゲームになりません")<br>
+Exit Sub<br>
+<br>
+ElseIf f ＜ 257 Then<br>
+<br>
+ '爆弾を「bombs」の数だけランダムに設置<br>
+ For e = 1 To f Step 1<br>
+  c = Int(Rnd() * 16 + 4)<br>
+  d = Int(Rnd() * 16 + 2)<br>
+<br>
+  '既に爆弾があった時は再検索<br>
+  Do While Cells(c, d).Value = "◎"<br>
+   c = Int(Rnd() * 16 + 4)<br>
+   d = Int(Rnd() * 16 + 2)<br>
+  Loop<br>
+ <br>
+ '乱数で決めた座標に爆弾を設置<br>
+ Cells(c, d).Value = "◎"<br>
+<br>
+ Next e<br>
+<br>
+'警告<br>
+Else<br>
+MsgBox ("爆弾の数がフィールド全部のマスよりも多くなっています")<br>
+End If<br>
+  <br>
+End Sub<br>
+<br>
+'フィールドをリセットするプログラム<br>
+Sub Reset()<br>
+<br>
+'リセットする範囲の指定<br>
+Dim a As Integer<br>
+Dim b As Integer<br>
+Dim c As Integer<br>
+<br>
+For a = 3 To 20 Step 1<br>
+ For b = 1 To 18 Step 1<br>
+<br>
+ 'いろいろリセット<br>
+ Cells(a, b).Value = Null<br>
+ Cells(a, b).Interior.ColorIndex = Null<br>
+ Cells(a, b).Font.ColorIndex = 16<br>
+ Cells(a, b).Borders(xlDiagonalDown).LineStyle = xlLineStyleNone<br>
+ Cells(a, b).Borders(xlDiagonalUp).LineStyle = xlLineStyleNone<br>
+<br>
+ Next b<br>
+Next a<br>
+<br>
+For c = 3 To 16 Step 1<br>
+<br>
+Cells(3, c).Value = Null<br>
+Cells(3, c).Font.ColorIndex = Null<br>
+<br>
+Next c<br>
+<br>
+<br>
+End Sub<br>
+<br>
+'手掛かりの数字をセットするプログラム<br>
+Sub Number_Set()<br>
+<br>
+'タテ列<br>
+Dim a As Integer<br>
+<br>
+'ヨコ列<br>
+Dim b As Integer<br>
+<br>
+'手掛かりの数字<br>
+Dim c As Integer<br>
+<br>
+'タテ列のcに対する相対的な位置<br>
+Dim ac As Integer<br>
+<br>
+'ヨコ列の(ry<br>
+Dim bc As Integer<br>
+<br>
+'256マス全てに適用<br>
+For a = 4 To 19 Step 1<br>
+ For b = 2 To 17 Step 1<br>
+<br>
+  '爆弾マスを除外<br>
+  If Cells(a, b).Value <> "◎" Then<br>
+<br>
+  '隣接する爆弾マスの数を記録<br>
+  c = 0<br>
+  For ac = -1 To 1 Step 1<br>
+   For bc = -1 To 1 Step 1<br>
+    If Cells(a + ac, b + bc).Value = "◎" Then<br>
+  <br>
+    c = c + 1<br>
+  <br>
+    End If<br>
+   Next bc<br>
+  Next ac<br>
+<br>
+  '数字の配置<br>
+  Cells(a, b).Value = c<br>
+  End If<br>
+  <br>
+  Cells(a, b).Font.ColorIndex = 16<br>
+<br>
+ Next b<br>
+Next a<br>
+<br>
+End Sub<br>
+<br>
+'フィールドを隠すプログラム<br>
+Sub Hide()<br>
+<br>
+'隠す範囲の指定<br>
+Dim a As Integer<br>
+Dim b As Integer<br>
+<br>
+For a = 4 To 19 Step 1<br>
+ For b = 2 To 17 Step 1<br>
+ '指定した範囲を隠す<br>
+ Cells(a, b).Interior.ColorIndex = 16<br>
+ <br>
+ Next b<br>
+Next a<br>
+<br>
+End Sub<br>
+<br>
+'マスを開けるプログラム<br>
+Sub Open_Field()<br>
+<br>
+Dim a As Integer<br>
+Dim b As Integer<br>
+Dim c As Integer<br>
+<br>
+'灰色のマスを透明に<br>
+If ActiveCell.Interior.ColorIndex = 16 Then<br>
+<br>
+'初手死亡回避<br>
+If opened = 0 Then<br>
+<br>
+Do While ActiveCell.Value = "◎"<br>
+Call Restart<br>
+Loop<br>
+<br>
+End If<br>
+<br>
+ActiveCell.Interior.ColorIndex = Null<br>
+<br>
+'爆弾マスだったら<br>
+If ActiveCell.Value = "◎" Then<br>
+For a = 4 To 19 Step 1<br>
+ For b = 2 To 17 Step 1<br>
+  If Cells(a, b).Value = "◎" Then<br>
+  Cells(a, b).Font.ColorIndex = 3<br>
+  End If<br>
+ Next b<br>
+Next a<br>
+<br>
+'警告音<br>
+Beep<br>
+<br>
+'ゲームオーバーメッセージ<br>
+MsgBox ("ゲームオーバー！！")<br>
+<br>
+'爆弾マスではなかったら<br>
+Else<br>
+'開けたマスの記録<br>
+opened = opened + 1<br>
+<br>
+'ゼロの時の特別な処理<br>
+If ActiveCell.Value = 0 Then<br>
+Call Open_0(ActiveCell.Row, ActiveCell.Column)<br>
+<br>
+'文字の色付け<br>
+ElseIf ActiveCell.Value = 1 Then<br>
+ActiveCell.Font.ColorIndex = 41<br>
+<br>
+ElseIf ActiveCell.Value = 2 Then<br>
+ActiveCell.Font.ColorIndex = 43<br>
+<br>
+ElseIf ActiveCell.Value = 3 Then<br>
+ActiveCell.Font.ColorIndex = 38<br>
+<br>
+ElseIf ActiveCell.Value = 4 Then<br>
+ActiveCell.Font.ColorIndex = 39<br>
+<br>
+ElseIf ActiveCell.Value = 5 Then<br>
+ActiveCell.Font.ColorIndex = 46<br>
+<br>
+ElseIf ActiveCell.Value = 6 Then<br>
+ActiveCell.Font.ColorIndex = 42<br>
+<br>
+ElseIf ActiveCell.Value = 7 Then<br>
+ActiveCell.Font.ColorIndex = 47<br>
+<br>
+ElseIf ActiveCell.Value = 8 Then<br>
+ActiveCell.Font.ColorIndex = 48<br>
+<br>
+End If<br>
+<br>
+'全部のマスを開けたら<br>
+c = Cells(4, 19).Value<br>
+If opened = 256 - c Then<br>
+For a = 3 To 20 Step 1<br>
+ For b = 1 To 18 Step 1<br>
+  Cells(a, b).Interior.ColorIndex = 38<br>
+ Next b<br>
+Next a<br>
+For a = 4 To 19 Step 1<br>
+ For b = 2 To 17 Step 1<br>
+  Cells(a, b).Interior.ColorIndex = 2<br>
+ Next b<br>
+Next a<br>
+<br>
+Call comment<br>
+<br>
+'警告音<br>
+Beep<br>
+<br>
+'ゲームオーバーメッセージ<br>
+MsgBox ("( 'ω')ゲームクリア！！")<br>
+<br>
+End If<br>
+<br>
+End If<br>
+<br>
+End If<br>
+<br>
+End Sub<br>
+<br>
+'0の周りを開けるプログラム<br>
+Sub Open_0(a As Integer, b As Integer)<br>
+<br>
+Dim c As Integer<br>
+Dim d As Integer<br>
+<br>
+'0を消す<br>
+Cells(a, b).Font.ColorIndex = 2<br>
+<br>
+'開けるマスの確認<br>
+For c = -1 To 1 Step 1<br>
+ For d = -1 To 1 Step 1<br>
+ Call Open_Around(a, b, c, d)<br>
+ Next d<br>
+Next c<br>
+<br>
+End Sub<br>
+<br>
+'実際に開けるプログラム<br>
+Sub Open_Around(a As Integer, b As Integer, c As Integer, d As Integer)<br>
+<br>
+'開けられていないマスを開け、openedにも記録<br>
+If Cells(a + c, b + d).Interior.ColorIndex = 16 Then<br>
+Cells(a + c, b + d).Interior.ColorIndex = 2<br>
+opened = opened + 1<br>
+<br>
+'開けたマスがまた0だった時の処理<br>
+If Cells(a + c, b + d).Value = 0 Then<br>
+Call Open_0(a + c, b + d)<br>
+<br>
+ElseIf Cells(a + c, b + d).Value = 1 Then<br>
+Cells(a + c, b + d).Font.ColorIndex = 41<br>
+<br>
+ElseIf Cells(a + c, b + d).Value = 2 Then<br>
+Cells(a + c, b + d).Font.ColorIndex = 43<br>
+<br>
+ElseIf Cells(a + c, b + d).Value = 3 Then<br>
+Cells(a + c, b + d).Font.ColorIndex = 38<br>
+<br>
+ElseIf Cells(a + c, b + d).Value = 4 Then<br>
+Cells(a + c, b + d).Font.ColorIndex = 39<br>
+<br>
+ElseIf Cells(a + c, b + d).Value = 5 Then<br>
+Cells(a + c, b + d).Font.ColorIndex = 46<br>
+<br>
+ElseIf Cells(a + c, b + d).Value = 6 Then<br>
+Cells(a + c, b + d).Font.ColorIndex = 42<br>
+<br>
+ElseIf Cells(a + c, b + d).Value = 7 Then<br>
+Cells(a + c, b + d).Font.ColorIndex = 47<br>
+<br>
+ElseIf Cells(a + c, b + d).Value = 8 Then<br>
+Cells(a + c, b + d).Font.ColorIndex = 48<br>
+<br>
+End If<br>
+<br>
+End If<br>
+<br>
+End Sub<br>
+<br>
+'旗を立てるプログラム<br>
+Sub Mark()<br>
+<br>
+If ActiveCell.Borders(xlDiagonalDown).LineStyle <> xlContinuous And ActiveCell.Interior.ColorIndex = 16 Then<br>
+<br>
+'線をつける<br>
+With ActiveCell.Borders(xlDiagonalDown)<br>
+     .LineStyle = xlContinuous<br>
+     .Weight = xlThick<br>
+     .ColorIndex = 3<br>
+End With<br>
+<br>
+With ActiveCell.Borders(xlDiagonalUp)<br>
+     .LineStyle = xlContinuous<br>
+     .Weight = xlThick<br>
+     .ColorIndex = 3<br>
+End With<br>
+<br>
+'残りの旗数を減らす<br>
+restmarks = restmarks - 1<br>
+<br>
+End If<br>
+     <br>
+End Sub<br>
+<br>
+'旗を抜くプログラム<br>
+Sub Dismark()<br>
+<br>
+If ActiveCell.Borders(xlDiagonalDown).LineStyle <> xlLineStyleNone And ActiveCell.Interior.ColorIndex = 16 Then<br>
+<br>
+'旗を抜く<br>
+ActiveCell.Borders(xlDiagonalDown).LineStyle = xlLineStyleNone<br>
+ActiveCell.Borders(xlDiagonalUp).LineStyle = xlLineStyleNone<br>
+<br>
+'残りの旗数を増やす<br>
+restmarks = restmarks + 1<br>
+<br>
+End If<br>
+<br>
+End Sub<br>
+<br>
+'ゲームクリアメッセージ<br>
+Sub comment()<br>
+<br>
+Dim a As Integer<br>
+<br>
+Cells(3, 3).Value = "C"<br>
+Cells(3, 4).Value = "O"<br>
+Cells(3, 5).Value = "N"<br>
+Cells(3, 6).Value = "G"<br>
+Cells(3, 7).Value = "R"<br>
+Cells(3, 8).Value = "A"<br>
+Cells(3, 9).Value = "T"<br>
+Cells(3, 10).Value = "U"<br>
+Cells(3, 11).Value = "L"<br>
+Cells(3, 12).Value = "A"<br>
+Cells(3, 13).Value = "T"<br>
+Cells(3, 14).Value = "I"<br>
+Cells(3, 15).Value = "O"<br>
+Cells(3, 16).Value = "N"<br>
+<br>
+For a = 3 To 16 Step 1<br>
+<br>
+Cells(3, a).Font.ColorIndex = 3<br>
+<br>
+Next a<br>
+<br>
+End Sub<br>
+<br>
+'難易度設定<br>
+Sub tutotial()<br>
+<br>
+Cells(4, 19).Value = 10<br>
+<br>
+End Sub<br>
+<br>
+Sub easy()<br>
+<br>
+Cells(4, 19).Value = 30<br>
+<br>
+End Sub<br>
+<br>
+Sub midium()<br>
+<br>
+Cells(4, 19).Value = 40<br>
+<br>
+End Sub<br>
+<br>
+Sub hard()<br>
+<br>
+Cells(4, 19).Value = 55<br>
+<br>
+End Sub<br>
+<br>
+Sub nightmare()<br>
+<br>
+Cells(4, 19).Value = 80<br>
+<br>
+End Sub<br>
+<br>
+'ゲームをやめるプログラム<br>
+Sub Power_Off()<br>
+<br>
+'リセットする範囲の指定<br>
+Dim a As Integer<br>
+Dim b As Integer<br>
+Dim c As Integer<br>
+<br>
+For a = 3 To 20 Step 1<br>
+ For b = 1 To 18 Step 1<br>
+<br>
+ 'いろいろリセット<br>
+ Cells(a, b).Value = Null<br>
+ Cells(a, b).Interior.ColorIndex = Null<br>
+ Cells(a, b).Font.ColorIndex = 16<br>
+ Cells(a, b).Borders(xlDiagonalDown).LineStyle = xlLineStyleNone<br>
+ Cells(a, b).Borders(xlDiagonalUp).LineStyle = xlLineStyleNone<br>
+<br>
+ Next b<br>
+Next a<br>
+<br>
+For c = 3 To 16 Step 1<br>
+<br>
+Cells(3, c).Value = Null<br>
+Cells(3, c).Font.ColorIndex = Null<br>
+<br>
+Next c<br>
+<br>
+Cells(4, 19).Value = 0<br>
+Cells(10, 19).Value = 0<br>
+<br>
+End Sub<br>
+
+<hr color="royalblue">
+
+<iframe allowtransparency="true"src="rink.html"frameborder="0"width="100%"heigth="100">
+サンプル
+</iframe>
+
+</body>
+</html>
